@@ -9,6 +9,7 @@ function TabBar({ state, descriptors, navigation }: BottomTabBarButtonProps) {
 
   const [dimensions, setDimensions] = useState({ height: 20, width: 100 });
   const buttonWidth = dimensions.width / state.routes.length;
+  const indicatorWidth = buttonWidth - 20;
 
   const onTabbarLayout = (e: LayoutChangeEvent) => {
     setDimensions({
@@ -31,9 +32,9 @@ function TabBar({ state, descriptors, navigation }: BottomTabBarButtonProps) {
         position: 'absolute',
         backgroundColor: '#fff',
         borderRadius: 30,
-        marginHorizontal: 12,
+        marginHorizontal: 9,
         height: dimensions.height - 15,
-        width: buttonWidth - 25,
+        width: indicatorWidth,
       }]} />
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
@@ -47,7 +48,11 @@ function TabBar({ state, descriptors, navigation }: BottomTabBarButtonProps) {
         const isFocused = state.index === index;
 
         const onPress = () => {
-          tabPositionX.value = withSpring(buttonWidth * index, { duration: 1500 });
+          tabPositionX.value = withSpring(buttonWidth * index,
+          {
+            damping: 60,
+            stiffness: 1000,
+          });
 
           const event = navigation.emit({
             type: 'tabPress',
@@ -90,7 +95,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 30,
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#29292B',
     marginHorizontal: 80,
