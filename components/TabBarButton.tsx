@@ -35,10 +35,13 @@ const TabBarButton = (
         const animatedIconStyle = useAnimatedStyle(() => {
             const scaleValue = interpolate(scale.value, [0, 1], [1, 1.2])
 
+            const top = interpolate(scale.value, [0, 1], [0, 9]);
+
             return {
                 transform: [{
                     scale: scaleValue
-                }]
+                }],
+                top
             }
         });
 
@@ -50,10 +53,12 @@ const TabBarButton = (
                 >
                 <Animated.View style={animatedIconStyle}>
                     {icon[routeName]({
-                        color: isFocused ? "#29292B" : "#C9C7BA"
+                        color: isFocused ? "#29292B" : "#fff"
                     })}
                 </Animated.View>
-                <Animated.Text style={[{ color: isFocused ? "#29292B" : "#C9C7BA" }, animatedTextStyle]}>{label}</Animated.Text>
+                <Animated.Text
+                    style={[{ color: isFocused ? "#29292B" : "#fff", fontSize: 12 }, animatedTextStyle]}>{label}
+                </Animated.Text>
             </PlatformPressable>
         )
 }

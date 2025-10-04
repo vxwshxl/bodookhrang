@@ -1,12 +1,40 @@
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Dimensions, LayoutChangeEvent } from 'react-native';
 
 import TabBarButton from './TabBarButton';
 import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
+import { useState } from 'react';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 function TabBar({ state, descriptors, navigation }: BottomTabBarButtonProps) {
 
+  const [dimensions, setDimensions] = useState({ height: 20, width: 100 });
+  const buttonWidth = dimensions.width / state.routes.length;
+
+  const onTabbarLayout = (e: LayoutChangeEvent) => {
+    setDimensions({
+      height: e.nativeEvent.layout.height,
+      width: e.nativeEvent.layout.width
+    })
+  };
+
+  const tabPositionX = useSharedValue(0);
+  
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: tabPositionX.value }]
+    }
+  });
+
   return (
-    <View style={styles.tabbar}>
+    <View onLayout={onTabbarLayout} style={styles.tabbar}>
+      <Animated.View style={[animatedStyle, {
+        position: 'absolute',
+        backgroundColor: '#fff',
+        borderRadius: 30,
+        marginHorizontal: 12,
+        height: dimensions.height - 15,
+        width: buttonWidth - 25,
+      }]} />
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label =
@@ -19,6 +47,8 @@ function TabBar({ state, descriptors, navigation }: BottomTabBarButtonProps) {
         const isFocused = state.index === index;
 
         const onPress = () => {
+          tabPositionX.value = withSpring(buttonWidth * index, { duration: 1500 });
+
           const event = navigation.emit({
             type: 'tabPress',
             target: route.key,
@@ -44,7 +74,7 @@ function TabBar({ state, descriptors, navigation }: BottomTabBarButtonProps) {
             onLongPress={onLongPress}
             isFocused={isFocused}
             routeName={route.name}
-            color={isFocused ? "#29292B" : "#C9C7BA"}
+            color={isFocused ? "#29292B" : "#fff"}
             label={label}
           />
         );
@@ -58,11 +88,11 @@ export default TabBar
 const styles = StyleSheet.create({
   tabbar: {
     position: 'absolute',
-    bottom: 50,
+    bottom: 30,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#29292B',
     marginHorizontal: 80,
     padding: 15,
     borderRadius: 50,
