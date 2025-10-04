@@ -50,7 +50,7 @@ function TabBar({ state, descriptors, navigation }: BottomTabBarButtonProps) {
         const onPress = () => {
           tabPositionX.value = withSpring(buttonWidth * index,
           {
-            damping: 60,
+            damping: 90,
             stiffness: 1000,
           });
 
