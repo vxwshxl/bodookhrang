@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginHorizontal: 80,
+    marginHorizontal: 42,
     paddingVertical: 15,
     borderRadius: 50,
     overflow: 'hidden', // IMPORTANT: ensures blur corners match radius
