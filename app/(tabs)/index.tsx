@@ -573,7 +573,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2F2F2F',
     borderRadius: 20,
     paddingHorizontal: 14,
-    paddingTop: 10,
+    paddingTop: 9,
     alignSelf: 'flex-end',
     maxWidth: '80%',
   },  
