@@ -9,28 +9,45 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator
+  ActivityIndicator,
+  Modal,
+  Animated,
+  StatusBar
 } from 'react-native';
+import { Ionicons, MaterialCommunityIcons, Feather, MaterialIcons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { SARVAM_API_KEY, SARVAM_API_ENDPOINT, SARVAM_MODEL, REASONING_EFFORT, MAX_TOKENS } from '@env';
+import Octicons from '@expo/vector-icons/Octicons';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 // Suggestion buttons data
 const SUGGESTIONS = [
-  'Decode Scheme',
-  'Ramayana',
-  'Maths Problem',
-  'Translate',
-  'Code in Hinglish',
-  "What's in my Aadhaar?"
+  { text: 'Decode Scheme', icon: 'document-text-outline' },
+  { text: 'Ramayana', icon: 'book-outline' },
+  { text: 'Maths Problem', icon: 'calculator-outline' },
+  { text: 'Translate', icon: 'language-outline' },
+  { text: 'Code in Hinglish', icon: 'code-slash-outline' },
+  { text: "What's in my Aadhaar?", icon: 'card-outline' }
 ];
 
 export default function ChatApp() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState('Think'); // 'Think' or 'Wiki'
+  const [mode, setMode] = useState('Think');
+  const [model, setModel] = useState('okhrangsa');
+  const [modelDropdownVisible, setModelDropdownVisible] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [chatHistory, setChatHistory] = useState([
+    { id: 1, title: 'Python task list', selected: true },
+    { id: 2, title: 'Vedas summary for test', selected: false },
+    { id: 3, title: 'Truth table explanation', selected: false },
+    { id: 4, title: 'Extract questions clearly', selected: false }
+  ]);
+  const [currentChatTitle, setCurrentChatTitle] = useState('New Chat');
   const scrollViewRef = useRef();
-
-  const API_KEY = "sk_6l2ncq41_epFu3PndVb88rx07Yu4Xnyby";
-  const API_URL = "https://api.sarvam.ai/v1/chat/completions";
+  const slideAnim = useRef(new Animated.Value(-300)).current;
 
   const sendMessage = async (messageText) => {
     const textToSend = messageText || input;
@@ -41,30 +58,42 @@ export default function ChatApp() {
     setInput('');
     setLoading(true);
 
+    // Set chat title from first message
+    if (messages.length === 0) {
+      setCurrentChatTitle(textToSend.slice(0, 30) + (textToSend.length > 30 ? '...' : ''));
+    }
+
     try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
+      const response = await fetch(SARVAM_API_ENDPOINT, {
+        method: "POST",
         headers: {
-          'api-subscription-key': API_KEY,
-          'Content-Type': 'application/json'
+          "api-subscription-key": SARVAM_API_KEY,
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: 'sarvam-m',
           messages: newMessages,
-          reasoning_effort: 'high',
-          max_tokens: 30000,
+          model: SARVAM_MODEL,
+          reasoning_effort: REASONING_EFFORT,
+          max_tokens: parseInt(MAX_TOKENS),
           wiki_grounding: mode === 'Wiki',
+          temperature: 0.2
         }),
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
+      console.log('API Response:', data);
+      
       const reply = data?.choices?.[0]?.message?.content || 'No response received.';
       setMessages([...newMessages, { role: 'assistant', content: reply }]);
     } catch (err) {
       console.error('Error:', err);
       setMessages([...newMessages, { 
         role: 'assistant', 
-        content: 'Sorry, I encountered an error connecting to Sarvam AI.' 
+        content: `Error: ${err.message}. Please check your network connection and API key.`
       }]);
     } finally {
       setLoading(false);
@@ -75,9 +104,45 @@ export default function ChatApp() {
     sendMessage(suggestion);
   };
 
+  const toggleSidebar = () => {
+    if (sidebarVisible) {
+      Animated.timing(slideAnim, {
+        toValue: -300,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => setSidebarVisible(false));
+    } else {
+      setSidebarVisible(true);
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
+  };
+
+  const handleNewChat = () => {
+    setMessages([]);
+    setCurrentChatTitle('New Chat');
+    toggleSidebar();
+  };
+
+  const handleLoadChat = (chat) => {
+    const updatedHistory = chatHistory.map(c => ({
+      ...c,
+      selected: c.id === chat.id
+    }));
+    setChatHistory(updatedHistory);
+    setCurrentChatTitle(chat.title);
+    toggleSidebar();
+    // Load chat messages here
+  };
+
   useEffect(() => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollToEnd({ animated: true });
+    if (scrollViewRef.current && messages.length > 0) {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
     }
   }, [messages]);
 
@@ -86,20 +151,24 @@ export default function ChatApp() {
       <KeyboardAvoidingView 
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? -50 : 20}
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton}>
-            <Text style={styles.backIcon}>›</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Chat</Text>
-          <TouchableOpacity style={styles.historyButton}>
-            <View style={styles.historyIcon}>
-              <View style={styles.historyCircle} />
-              <View style={styles.historyArrow} />
-            </View>
-          </TouchableOpacity>
+          <View style={styles.headerLeft}>
+            <TouchableOpacity style={styles.menuButton} onPress={toggleSidebar}>
+              <Feather name="menu" size={24} color="#ECECEC" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>OkhranGPT</Text>
+          </View>
+          <View style={styles.headerRight}>
+            <TouchableOpacity style={styles.iconButton}>
+              <Feather name="edit" size={20} color="#ECECEC" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton} onPress={() => setMenuVisible(true)}>
+              <Feather name="more-vertical" size={20} color="#ECECEC" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Messages Area */}
@@ -110,8 +179,10 @@ export default function ChatApp() {
         >
           {messages.length === 0 ? (
             <View style={styles.emptyState}>
-              <View style={styles.logo}>
-                <View style={styles.logoRays} />
+              <View style={styles.logoContainer}>
+                <View style={styles.logo}>
+                  <MaterialCommunityIcons name="chat-processing" size={48} color="#19C37D" />
+                </View>
               </View>
               
               <View style={styles.suggestionsGrid}>
@@ -119,82 +190,266 @@ export default function ChatApp() {
                   <TouchableOpacity
                     key={index}
                     style={styles.suggestionButton}
-                    onPress={() => handleSuggestionPress(suggestion)}
+                    onPress={() => handleSuggestionPress(suggestion.text)}
                   >
-                    <Text style={styles.suggestionText}>{suggestion}</Text>
+                    <Ionicons name={suggestion.icon} size={20} color="#8E8EA0" />
+                    <Text style={styles.suggestionText}>{suggestion.text}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
             </View>
           ) : (
-            messages.map((msg, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.messageBubble,
-                  msg.role === 'user' ? styles.userBubble : styles.assistantBubble
-                ]}
-              >
-                <Text style={[
-                  styles.messageText,
-                  msg.role === 'user' ? styles.userText : styles.assistantText
+            <>
+              {messages.map((msg, index) => (
+                <View key={index} style={[
+                  styles.messageRow,
+                  msg.role === 'user' && styles.messageRowUser
                 ]}>
-                  {msg.content}
-                </Text>
-              </View>
-            ))
-          )}
-          {loading && (
-            <View style={styles.loadingBubble}>
-              <ActivityIndicator color="#f97316" />
-            </View>
+                  <View style={[
+                    styles.messageContent,
+                    msg.role === 'user' && styles.messageContentUser
+                  ]}>
+                    <View style={styles.messageTextContainer}>
+                      <Text style={styles.messageText}>{msg.content}</Text>
+                      {msg.role === 'assistant' && (
+                        <View style={styles.actionButtons}>
+                          <TouchableOpacity style={styles.actionButton}>
+                           <Octicons name="copy" size={17} color="#fff" />
+                          </TouchableOpacity>
+                          <TouchableOpacity style={styles.actionButton}>
+                            <Ionicons name="volume-high-outline" size={22} color="#fff" />
+                          </TouchableOpacity>
+                          <TouchableOpacity style={styles.actionButton}>
+                            <MaterialIcons name="loop" size={20} color="#fff" />
+                          </TouchableOpacity>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                </View>
+              ))}
+              {loading && (
+                <View style={styles.messageRow}>
+                  <View style={styles.messageContent}>
+                    <View style={styles.loadingContainer}>
+                      <ActivityIndicator color="#19C37D" size="small" />
+                    </View>
+                  </View>
+                </View>
+              )}
+            </>
           )}
         </ScrollView>
 
         {/* Input Area */}
         <View style={styles.inputWrapper}>
+          {/* Mode Selector */}
+          <View style={styles.modeSelector}>
+            <View style={styles.modeSelectorLeft}>
+              <TouchableOpacity
+                style={[styles.modeButton, mode === 'Think' && styles.modeButtonActive]}
+                onPress={() => setMode('Think')}
+              >
+                <Ionicons 
+                  name="bulb-outline" 
+                  size={18} 
+                  color={mode === 'Think' ? '#ECECEC' : '#8E8EA0'} 
+                />
+                <Text style={[styles.modeText, mode === 'Think' && styles.modeTextActive]}>
+                  Think
+                </Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.modeButton, mode === 'Wiki' && styles.modeButtonActive]}
+                onPress={() => setMode('Wiki')}
+              >
+                <Ionicons 
+                  name="library-outline" 
+                  size={18} 
+                  color={mode === 'Wiki' ? '#ECECEC' : '#8E8EA0'} 
+                />
+                <Text style={[styles.modeText, mode === 'Wiki' && styles.modeTextActive]}>
+                  Wiki
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={styles.modelButton}
+              onPress={() => setModelDropdownVisible(!modelDropdownVisible)}
+            >
+              <Text style={styles.modelText}>{model}</Text>
+              <Ionicons 
+                name={modelDropdownVisible ? "chevron-up" : "chevron-down"} 
+                size={16} 
+                color="#8E8EA0" 
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Model Dropdown */}
+          {modelDropdownVisible && (
+            <View style={styles.modelDropdown}>
+              <TouchableOpacity
+                style={[styles.modelOption, model === 'okhrangsa' && styles.modelOptionActive]}
+                onPress={() => {
+                  setModel('okhrangsa');
+                  setModelDropdownVisible(false);
+                }}
+              >
+                <Text style={[styles.modelOptionText, model === 'okhrangsa' && styles.modelOptionTextActive]}>
+                  okhrangsa
+                </Text>
+                {model === 'okhrangsa' && (
+                  <Ionicons name="checkmark" size={18} color="#19C37D" />
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modelOption, model === 'aronai-bodo' && styles.modelOptionActive]}
+                onPress={() => {
+                  setModel('aronai-bodo');
+                  setModelDropdownVisible(false);
+                }}
+              >
+                <Text style={[styles.modelOptionText, model === 'aronai-bodo' && styles.modelOptionTextActive]}>
+                  aronai-bodo
+                </Text>
+                {model === 'aronai-bodo' && (
+                  <Ionicons name="checkmark" size={18} color="#19C37D" />
+                )}
+              </TouchableOpacity>
+            </View>
+          )}
+
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
               placeholder="What's on your mind?"
-              placeholderTextColor="#9ca3af"
+              placeholderTextColor="#8E8EA0"
               value={input}
               onChangeText={setInput}
               multiline
               maxLength={2000}
             />
-            <TouchableOpacity 
-              style={styles.sendButton}
-              onPress={() => sendMessage()}
-              disabled={loading || !input.trim()}
-            >
-              <Text style={styles.sendIcon}>↑</Text>
-            </TouchableOpacity>
-          </View>
-          
-          {/* Mode Selector */}
-          <View style={styles.modeSelector}>
-            <TouchableOpacity
-              style={[styles.modeButton, mode === 'Think' && styles.modeButtonActive]}
-              onPress={() => setMode('Think')}
-            >
-              <Text style={styles.modeIcon}>🧠</Text>
-              <Text style={[styles.modeText, mode === 'Think' && styles.modeTextActive]}>
-                Think
-              </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={[styles.modeButton, mode === 'Wiki' && styles.modeButtonActive]}
-              onPress={() => setMode('Wiki')}
-            >
-              <Text style={styles.modeIcon}>📚</Text>
-              <Text style={[styles.modeText, mode === 'Wiki' && styles.modeTextActive]}>
-                Wiki
-              </Text>
-            </TouchableOpacity>
+            {input.trim() && (
+              <TouchableOpacity 
+                style={styles.sendButton}
+                onPress={() => sendMessage()}
+                disabled={loading}
+              >
+                <Ionicons name="arrow-up" size={20} color="#000000" />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
+
+        {/* Sidebar Menu */}
+        {sidebarVisible && (
+          <TouchableOpacity 
+            style={styles.overlay} 
+            activeOpacity={1} 
+            onPress={toggleSidebar}
+          >
+            <Animated.View 
+              style={[
+                styles.sidebar,
+                { transform: [{ translateX: slideAnim }] }
+              ]}
+            >
+              <TouchableOpacity activeOpacity={1} style={styles.sidebarContent}>
+                {/* Search Bar */}
+                <View style={styles.searchContainer}>
+                  <Ionicons name="search" size={20} color="#8E8EA0" />
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search"
+                    placeholderTextColor="#8E8EA0"
+                  />
+                </View>
+
+                {/* Scrollable Content */}
+                <ScrollView style={styles.sidebarScrollable} showsVerticalScrollIndicator={false}>
+                  {/* New Chat Button */}
+                  <TouchableOpacity style={styles.newProjectButton} onPress={handleNewChat}>
+                    <MaterialCommunityIcons name="folder-plus-outline" size={24} color="#ECECEC" />
+                    <Text style={styles.newProjectText}>New chat</Text>
+                  </TouchableOpacity>
+
+                  {/* Recent Chats */}
+                  <View style={styles.recentChatsHeader}>
+                    <Text style={styles.recentChatsTitle}>Recent</Text>
+                  </View>
+
+                  <View style={styles.chatList}>
+                    {chatHistory.map((chat) => (
+                      <TouchableOpacity 
+                        key={chat.id} 
+                        style={[
+                          styles.chatItem,
+                          chat.selected && styles.chatItemSelected
+                        ]}
+                        onPress={() => handleLoadChat(chat)}
+                      >
+                        <Text style={styles.chatItemText}>{chat.title}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+
+                {/* Upgrade to Pro */}
+                <TouchableOpacity style={styles.upgradeButton}>
+                  <MaterialCommunityIcons name="crown-outline" size={24} color="#FFD700" />
+                  <Text style={styles.upgradeText}>Upgrade to Pro</Text>
+                </TouchableOpacity>
+              </TouchableOpacity>
+            </Animated.View>
+          </TouchableOpacity>
+        )}
+
+        {/* Three Dots Menu Modal */}
+        <Modal
+          visible={menuVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setMenuVisible(false)}
+        >
+          <BlurView intensity={30} tint="dark" style={styles.modalOverlay}>
+            <TouchableOpacity 
+              style={styles.modalOverlayTouchable} 
+              activeOpacity={1}
+              onPress={() => setMenuVisible(false)}
+            >
+              <BlurView intensity={80} tint="dark" style={styles.menuPopup}>
+                <TouchableOpacity style={styles.menuItem}>
+                  <Ionicons name="share-outline" size={20} color="#ECECEC" />
+                  <Text style={styles.menuItemText}>Share</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.menuItem}>
+                  <Ionicons name="create-outline" size={20} color="#ECECEC" />
+                  <Text style={styles.menuItemText}>Rename</Text>
+                  <Ionicons name="chevron-forward" size={20} color="#8E8EA0" style={styles.menuItemArrow} />
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.menuItem}>
+                  <Ionicons name="flag-outline" size={20} color="#ECECEC" />
+                  <Text style={styles.menuItemText}>Report</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.menuItem}>
+                  <Ionicons name="archive-outline" size={20} color="#ECECEC" />
+                  <Text style={styles.menuItemText}>Archive</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.menuItem}>
+                  <Ionicons name="trash-outline" size={20} color="#FF453A" />
+                  <Text style={[styles.menuItemText, styles.menuItemDangerText]}>Delete</Text>
+                </TouchableOpacity>
+              </BlurView>
+            </TouchableOpacity>
+          </BlurView>
+        </Modal>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -203,7 +458,7 @@ export default function ChatApp() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fafaf9',
+    backgroundColor: '#000',
   },
   keyboardView: {
     flex: 1,
@@ -213,206 +468,381 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
+    paddingBottom: 12,
+    backgroundColor: '#000',
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: '#2F2F2F',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
-  backButton: {
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  menuButton: {
     width: 40,
     height: 40,
     justifyContent: 'center',
-    alignItems: 'center',
-  },
-  backIcon: {
-    fontSize: 32,
-    fontWeight: '300',
-    transform: [{ rotate: '180deg' }],
-    color: '#000',
+    alignItems: 'flex-start',
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '600',
-    color: '#000',
+    color: '#ECECEC',
+    fontFamily: 'twk',
   },
-  historyButton: {
+  headerRight: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  iconButton: {
     width: 40,
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  historyIcon: {
-    width: 24,
-    height: 24,
-    borderWidth: 2,
-    borderColor: '#000',
-    borderRadius: 12,
-    position: 'relative',
-  },
-  historyCircle: {
-    position: 'absolute',
-    top: 4,
-    right: 4,
-    width: 2,
-    height: 6,
-    backgroundColor: '#000',
-  },
-  historyArrow: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 4,
-    height: 2,
-    backgroundColor: '#000',
   },
   messagesContainer: {
     flex: 1,
+    backgroundColor: '#000',
   },
   messagesContent: {
-    padding: 16,
     flexGrow: 1,
   },
   emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 120,
+    paddingTop: 80,
+    paddingBottom: 40,
+  },
+  logoContainer: {
+    marginBottom: 60,
   },
   logo: {
-    width: 120,
-    height: 120,
-    marginBottom: 60,
+    width: 80,
+    height: 80,
+    borderRadius: 100,
+    backgroundColor: '#19C37D',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  logoRays: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 3,
-    borderColor: '#f97316',
-    position: 'relative',
-    backgroundColor: 'transparent',
   },
   suggestionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
     gap: 12,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
+    maxWidth: 600,
   },
   suggestionButton: {
-    backgroundColor: '#fef3f2',
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderRadius: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#2F2F2F',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 100,
     borderWidth: 1,
-    borderColor: '#ffe4e1',
+    borderColor: '#3F3F3F',
   },
   suggestionText: {
-    color: '#1f2937',
-    fontSize: 15,
+    color: '#ECECEC',
+    fontSize: 14,
     fontWeight: '500',
+    fontFamily: 'fgr',
   },
-  messageBubble: {
-    maxWidth: '80%',
-    padding: 12,
-    borderRadius: 18,
-    marginBottom: 8,
+  messageRow: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
-  userBubble: {
+  messageRowUser: {
+    alignItems: 'flex-end',
+  },
+  messageContent: {
+    flexDirection: 'row',
+    gap: 12,
+    maxWidth: '100%',
+  },
+  messageContentUser: {
+    backgroundColor: '#2F2F2F',
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     alignSelf: 'flex-end',
-    backgroundColor: '#2563eb',
-  },
-  assistantBubble: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#f3f4f6',
+    maxWidth: '80%',
+  },  
+  messageTextContainer: {
+    flexShrink: 1,
   },
   messageText: {
-    fontSize: 15,
-    lineHeight: 20,
+    fontSize: 18,
+    lineHeight: 24,
+    color: '#ECECEC',
+    fontFamily: 'fgr',
   },
-  userText: {
-    color: '#fff',
-  },
-  assistantText: {
-    color: '#1f2937',
-  },
-  loadingBubble: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#f3f4f6',
-    padding: 16,
-    borderRadius: 18,
-    marginBottom: 8,
-  },
-  inputWrapper: {
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 16,
-  },
-  inputContainer: {
+  actionButtons: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    backgroundColor: '#f9fafb',
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginBottom: 12,
+    gap: 4,
+    marginTop: 12,
+    flexWrap: 'wrap',
   },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: '#1f2937',
-    maxHeight: 100,
-    paddingVertical: 8,
-  },
-  sendButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#78716c',
+  actionButton: {
+    width: 32,
+    height: 32,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 8,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
   },
-  sendIcon: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
+  loadingContainer: {
+    paddingVertical: 8,
+  },
+  inputWrapper: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: Platform.OS === 'android' ? 10 : 65,
   },
   modeSelector: {
     flexDirection: 'row',
-    gap: 12,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  modeSelectorLeft: {
+    flexDirection: 'row',
+    gap: 8,
   },
   modeButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
     gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 100,
+    backgroundColor: '#2F2F2F',
+    borderWidth: 1,
+    borderColor: '#3F3F3F',
   },
   modeButtonActive: {
-    backgroundColor: '#fef3f2',
-    borderColor: '#fed7d7',
-  },
-  modeIcon: {
-    fontSize: 16,
+    backgroundColor: '#19C37D',
+    borderColor: '#19C37D',
   },
   modeText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '500',
-    color: '#6b7280',
+    color: '#8E8EA0',
+    fontFamily: 'fgr',
   },
   modeTextActive: {
-    color: '#f97316',
+    color: '#ECECEC',
+  },
+  modelButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 100,
+    backgroundColor: '#2F2F2F',
+    borderWidth: 1,
+    borderColor: '#3F3F3F',
+  },
+  modelText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#ECECEC',
+    fontFamily: 'fgr',
+  },
+  modelDropdown: {
+    backgroundColor: '#2F2F2F',
+    borderRadius: 20,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#3F3F3F',
+    overflow: 'hidden',
+  },
+  modelOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  modelOptionActive: {
+    backgroundColor: 'rgba(25, 195, 125, 0.1)',
+  },
+  modelOptionText: {
+    fontSize: 14,
+    color: '#ECECEC',
+    fontFamily: 'fgr',
+  },
+  modelOptionTextActive: {
+    color: '#19C37D',
+    fontWeight: '600',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2F2F2F',
+    borderRadius: 30,
+    paddingHorizontal: 16,
+    paddingVertical: Platform.OS === 'android' ? 7 : 15,
+    gap: 8,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: '#ECECEC',
+    maxHeight: 100,
+    fontFamily: 'fgr',
+  },
+  sendButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 100,
+    backgroundColor: '#ECECEC',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  sidebar: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 280,
+    backgroundColor: '#000',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    paddingHorizontal: 16,
+  },
+  sidebarContent: {
+    flex: 1,
+  },
+  sidebarScrollable: {
+    flex: 1,
+    marginBottom: 80,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2F2F2F',
+    borderRadius: 100,
+    paddingHorizontal: 12,
+    paddingVertical: Platform.OS === 'android' ? 2 : 10,
+    gap: 8,
+    marginBottom: 16,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#ECECEC',
+    fontFamily: 'fgr',
+  },
+  newProjectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    backgroundColor: 'transparent',
+    borderRadius: 100,
+    marginBottom: 20,
+  },
+  newProjectText: {
+    fontSize: 16,
+    color: '#ECECEC',
+    fontWeight: '500',
+    fontFamily: 'fgr',
+  },
+  recentChatsHeader: {
+    paddingVertical: 12,
+    marginBottom: 8,
+  },
+  recentChatsTitle: {
+    fontSize: 14,
+    color: '#8E8EA0',
+    fontWeight: '500',
+    fontFamily: 'fgr',
+  },
+  chatList: {
+    gap: 4,
+    marginBottom: 20,
+  },
+  chatItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    backgroundColor: 'transparent',
+    borderRadius: 100,
+  },
+  chatItemSelected: {
+    backgroundColor: '#2F2F2F',
+  },
+  chatItemText: {
+    fontSize: 14,
+    color: '#ECECEC',
+    fontFamily: 'fgr',
+  },
+  upgradeButton: {
+    position: 'absolute',
+    bottom: 20,
+    left: 16,
+    right: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    paddingVertical: 14,
+    backgroundColor: '#2F2F2F',
+    borderRadius: 15,
+  },
+  upgradeText: {
+    fontSize: 16,
+    color: '#ECECEC',
+    fontWeight: '600',
+    fontFamily: 'fgr',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalOverlayTouchable: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
+  menuPopup: {
+    borderRadius: 20,
+    width: '80%',
+    maxWidth: 340,
+    overflow: 'hidden',
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
+  menuItemText: {
+    fontSize: 16,
+    color: '#ECECEC',
+    flex: 1,
+    fontFamily: 'fgr',
+  },
+  menuItemArrow: {
+    marginLeft: 'auto',
+  },
+  menuItemDangerText: {
+    color: '#FF453A',
   },
 });
