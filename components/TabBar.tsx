@@ -100,7 +100,7 @@ export default TabBar
 const styles = StyleSheet.create({
   tabbar: {
     position: 'absolute',
-    bottom: 10,
+    bottom: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

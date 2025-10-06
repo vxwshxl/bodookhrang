@@ -1,23 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useState } from 'react';
+import { BHASHINI_API_ENDPOINT, BHASHINI_SUBSCRIPTION_KEY } from '@env';
+
 import {
-  View,
+  Animated,
+  Clipboard,
+  Keyboard,
+  Modal,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  Share,
+  StatusBar,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  StatusBar,
-  ScrollView,
-  Animated,
-  Clipboard,
-  Share,
-  Modal,
   TouchableWithoutFeedback,
-  Keyboard,
-  Platform,
+  View,
 } from 'react-native';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface TranslationCard {
   id: string;
@@ -72,6 +74,62 @@ export default function TranslateScreen() {
     }
   };
 
+  const LANGUAGE_CODES: { [key: string]: string } = {
+    English: 'en',
+    Bodo: 'brx',
+    Assamese: 'as',
+    Bengali: 'bn',
+    Hindi: 'hi',
+  };
+
+  const translateTextAPI = async (text: string, from: string, to: string) => {
+    if (!text.trim()) return '';
+  
+    const sourceLang = LANGUAGE_CODES[from];
+    const targetLang = LANGUAGE_CODES[to];
+  
+    const endpoint = BHASHINI_API_ENDPOINT;
+    const subscriptionKey = BHASHINI_SUBSCRIPTION_KEY;
+  
+    const requestData = {
+      pipelineTasks: [
+        {
+          taskType: "translation",
+          config: {
+            language: { sourceLanguage: sourceLang, targetLanguage: targetLang },
+            serviceId: "ai4bharat/indictrans-v2-all-gpu--t4"
+          }
+        }
+      ],
+      inputData: { input: [{ source: text }] }
+    };
+  
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': subscriptionKey
+        },
+        body: JSON.stringify(requestData)
+      });
+    
+      const text = await response.text(); // get raw text first
+      let data;
+      try {
+        data = JSON.parse(text); // try parsing JSON
+      } catch (err) {
+        // console.error('Non-JSON response from API:', text);
+        return `[${text}] → ${to}`; // fallback
+      }
+    
+      return data.pipelineResponse[0]?.output[0]?.target || '';
+    } catch (err) {
+      console.error('Translation API error:', err);
+      return `[${text}] → ${to}`;
+    }    
+  };  
+
   const translateText = (text: string, from: string, to: string) => {
     if (!text.trim()) {
       setTranslatedText('');
@@ -90,10 +148,28 @@ export default function TranslateScreen() {
     }
   };
 
-  const handleSourceTextChange = (text: string) => {
+  useEffect(() => {
+    if (sourceText.trim()) {
+      const translate = async () => {
+        const translated = await translateTextAPI(sourceText, sourceLang, targetLang);
+        setTranslatedText(translated);
+      };
+      translate();
+    } else {
+      setTranslatedText('');
+    }
+  }, [sourceText, sourceLang, targetLang]);  
+
+  const handleSourceTextChange = async (text: string) => {
     setSourceText(text);
-    translateText(text, sourceLang, targetLang);
+  
+    // If no text, clear translation
+    if (!text.trim()) {
+      setTranslatedText('');
+      return;
+    }
   };
+  
 
   const clearSourceText = () => {
     setSourceText('');
@@ -103,12 +179,17 @@ export default function TranslateScreen() {
   const swapLanguages = () => {
     const tempLang = sourceLang;
     const tempText = sourceText;
-    
+  
     setSourceLang(targetLang);
     setTargetLang(tempLang);
     setSourceText(translatedText);
     setTranslatedText(tempText);
-  };
+  
+    // Trigger translation for swapped text
+    if (translatedText.trim()) {
+      handleSourceTextChange(translatedText);
+    }
+  };  
 
   const copyToClipboard = (text: string, key: string = 'main') => {
     Clipboard.setString(text);
@@ -376,7 +457,7 @@ export default function TranslateScreen() {
                 >
                   <Ionicons name="share-outline" size={24} color="#00D9FF" />
                 </TouchableOpacity>
-                {isInputFocused && (
+                {(sourceText.trim() || translatedText.trim()) && (
                   <TouchableOpacity 
                     style={styles.nextButton}
                     onPress={createNewCard}
