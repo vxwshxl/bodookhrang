@@ -12,7 +12,8 @@ import {
   ActivityIndicator,
   Modal,
   Animated,
-  StatusBar
+  StatusBar,
+  Keyboard
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons, Feather, MaterialIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -26,7 +27,7 @@ const SUGGESTIONS = [
   { text: 'Ramayana', icon: 'book-outline' },
   { text: 'Maths Problem', icon: 'calculator-outline' },
   { text: 'Translate', icon: 'language-outline' },
-  { text: 'Code in Hinglish', icon: 'code-slash-outline' },
+  { text: 'Coding', icon: 'code-slash-outline' },
   { text: "What's in my Aadhaar?", icon: 'card-outline' }
 ];
 
@@ -50,6 +51,7 @@ export default function ChatApp() {
   const slideAnim = useRef(new Animated.Value(-300)).current;
 
   const sendMessage = async (messageText) => {
+    Keyboard.dismiss();
     const textToSend = messageText || input;
     if (!textToSend.trim()) return;
 
@@ -631,11 +633,11 @@ const styles = StyleSheet.create({
   modeText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#8E8EA0',
+    color: '#fff',
     fontFamily: 'fgr',
   },
   modeTextActive: {
-    color: '#ECECEC',
+    color: '#fff',
   },
   modelButton: {
     flexDirection: 'row',
