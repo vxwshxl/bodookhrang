@@ -84,51 +84,64 @@ export default function TranslateScreen() {
 
   const translateTextAPI = async (text: string, from: string, to: string) => {
     if (!text.trim()) return '';
-  
+
     const sourceLang = LANGUAGE_CODES[from];
     const targetLang = LANGUAGE_CODES[to];
-  
+
     const endpoint = BHASHINI_API_ENDPOINT;
     const subscriptionKey = BHASHINI_SUBSCRIPTION_KEY;
-  
-    const requestData = {
-      pipelineTasks: [
-        {
-          taskType: "translation",
-          config: {
-            language: { sourceLanguage: sourceLang, targetLanguage: targetLang },
-            serviceId: "ai4bharat/indictrans-v2-all-gpu--t4"
+
+    // Split text by line breaks
+    const lines = text.split('\n');
+    
+    // Translate each line separately
+    const translatedLines = await Promise.all(
+      lines.map(async (line) => {
+        // If line is empty or only whitespace, preserve it
+        if (!line.trim()) return '';
+        
+        const requestData = {
+          pipelineTasks: [
+            {
+              taskType: "translation",
+              config: {
+                language: { sourceLanguage: sourceLang, targetLanguage: targetLang },
+                serviceId: "ai4bharat/indictrans-v2-all-gpu--t4"
+              }
+            }
+          ],
+          inputData: { input: [{ source: line }] }
+        };
+
+        try {
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': subscriptionKey
+            },
+            body: JSON.stringify(requestData)
+          });
+        
+          const responseText = await response.text();
+          let data;
+          try {
+            data = JSON.parse(responseText);
+          } catch (err) {
+            return `[${line}] → ${to}`;
           }
+        
+          return data.pipelineResponse[0]?.output[0]?.target || '';
+        } catch (err) {
+          console.error('Translation API error:', err);
+          return `[${line}] → ${to}`;
         }
-      ],
-      inputData: { input: [{ source: text }] }
-    };
-  
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': subscriptionKey
-        },
-        body: JSON.stringify(requestData)
-      });
-    
-      const text = await response.text(); // get raw text first
-      let data;
-      try {
-        data = JSON.parse(text); // try parsing JSON
-      } catch (err) {
-        // console.error('Non-JSON response from API:', text);
-        return `[${text}] → ${to}`; // fallback
-      }
-    
-      return data.pipelineResponse[0]?.output[0]?.target || '';
-    } catch (err) {
-      console.error('Translation API error:', err);
-      return `[${text}] → ${to}`;
-    }    
-  };  
+      })
+    );
+
+    // Join translated lines back with line breaks
+    return translatedLines.join('\n');
+  };
 
   const translateText = (text: string, from: string, to: string) => {
     if (!text.trim()) {
