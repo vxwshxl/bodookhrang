@@ -151,7 +151,7 @@ export default function ChatApp() {
       <KeyboardAvoidingView 
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? -50 : 20}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? -50 : -80}
       >
         {/* Header */}
         <View style={styles.header}>
@@ -601,7 +601,7 @@ const styles = StyleSheet.create({
   inputWrapper: {
     paddingHorizontal: 16,
     paddingTop: 8,
-    paddingBottom: Platform.OS === 'android' ? 10 : 65,
+    paddingBottom: Platform.OS === 'android' ? 100 : 65,
   },
   modeSelector: {
     flexDirection: 'row',
@@ -792,7 +792,7 @@ const styles = StyleSheet.create({
   },
   upgradeButton: {
     position: 'absolute',
-    bottom: Platform.OS === 'android' ? 10 : 65,
+    bottom: Platform.OS === 'android' ? 100 : 65,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
