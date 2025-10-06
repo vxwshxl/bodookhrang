@@ -16,10 +16,11 @@ import {
   Keyboard
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons, Feather, MaterialIcons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
-import { SARVAM_API_KEY, SARVAM_API_ENDPOINT, SARVAM_MODEL, REASONING_EFFORT, MAX_TOKENS } from '@env';
 import Octicons from '@expo/vector-icons/Octicons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { BlurView } from 'expo-blur';
+import { SARVAM_API_KEY, SARVAM_API_ENDPOINT, SARVAM_MODEL, REASONING_EFFORT, MAX_TOKENS } from '@env';
+import Markdown from 'react-native-markdown-display';
 
 // Suggestion buttons data
 const SUGGESTIONS = [
@@ -212,7 +213,9 @@ export default function ChatApp() {
                     msg.role === 'user' && styles.messageContentUser
                   ]}>
                     <View style={styles.messageTextContainer}>
-                      <Text style={styles.messageText}>{msg.content}</Text>
+                      <Markdown style={markdownStyles}>
+                        {msg.content}
+                      </Markdown>
                       {msg.role === 'assistant' && (
                         <View style={styles.actionButtons}>
                           <TouchableOpacity style={styles.actionButton}>
@@ -570,7 +573,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2F2F2F',
     borderRadius: 20,
     paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingTop: 10,
     alignSelf: 'flex-end',
     maxWidth: '80%',
   },  
@@ -847,3 +850,197 @@ const styles = StyleSheet.create({
     color: '#FF453A',
   },
 });
+
+const markdownStyles = {
+  body: {
+    color: '#ECECEC',
+    fontSize: 17,
+    lineHeight: 24,
+    fontFamily: 'fgr',
+  },
+  heading1: {
+    color: '#ECECEC',
+    fontSize: 24,
+    fontWeight: '700',
+    marginTop: 16,
+    marginBottom: 12,
+    lineHeight: 32,
+  },
+  heading2: {
+    color: '#ECECEC',
+    fontSize: 22,
+    fontWeight: '700',
+    marginTop: 14,
+    marginBottom: 10,
+    lineHeight: 28,
+  },
+  heading3: {
+    color: '#ECECEC',
+    fontSize: 21,
+    fontWeight: '600',
+    marginTop: 12,
+    marginBottom: 8,
+    lineHeight: 26,
+  },
+  heading4: {
+    color: '#ECECEC',
+    fontSize: 20,
+    fontWeight: '600',
+    marginTop: 10,
+    marginBottom: 6,
+    lineHeight: 24,
+  },
+  heading5: {
+    color: '#ECECEC',
+    fontSize: 19,
+    fontWeight: '600',
+    marginTop: 8,
+    marginBottom: 4,
+    lineHeight: 22,
+  },
+  heading6: {
+    color: '#ECECEC',
+    fontSize: 18,
+    fontWeight: '600',
+    marginTop: 6,
+    marginBottom: 4,
+    lineHeight: 20,
+  },
+  paragraph: {
+    color: '#ECECEC',
+    fontSize: 17,
+    lineHeight: 24,
+    marginTop: 0,
+    marginBottom: 12,
+  },
+  strong: {
+    color: '#ECECEC',
+    fontWeight: '700',
+  },
+  em: {
+    color: '#ECECEC',
+    fontStyle: 'italic',
+  },
+  link: {
+    color: '#19C37D',
+    textDecorationLine: 'underline',
+  },
+  blockquote: {
+    backgroundColor: '#2F2F2F',
+    borderLeftColor: '#19C37D',
+    borderLeftWidth: 4,
+    marginLeft: 0,
+    marginRight: 0,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginVertical: 8,
+  },
+  code_inline: {
+    backgroundColor: '#000',
+    color: '#19C37D',
+    fontSize: 14,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+  },
+  code_block: {
+    backgroundColor: '#1A1A1A',
+    color: '#ECECEC',
+    fontSize: 14,
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 8,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    borderWidth: 1,
+    borderColor: '#2F2F2F',
+  },
+  fence: {
+    backgroundColor: '#1A1A1A',
+    color: '#ECECEC',
+    fontSize: 14,
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 8,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    borderWidth: 1,
+    borderColor: '#2F2F2F',
+  },
+  bullet_list: {
+    marginVertical: 8,
+  },
+  ordered_list: {
+    marginVertical: 8,
+  },
+  list_item: {
+    flexDirection: 'row',
+    marginVertical: 4,
+  },
+  bullet_list_icon: {
+    color: '#19C37D',
+    fontSize: 17,
+    lineHeight: 24,
+    marginRight: 8,
+  },
+  ordered_list_icon: {
+    color: '#19C37D',
+    fontSize: 17,
+    lineHeight: 24,
+    marginRight: 8,
+  },
+  bullet_list_content: {
+    flex: 1,
+    color: '#ECECEC',
+    fontSize: 17,
+    lineHeight: 24,
+  },
+  ordered_list_content: {
+    flex: 1,
+    color: '#ECECEC',
+    fontSize: 17,
+    lineHeight: 24,
+  },
+  hr: {
+    backgroundColor: '#3F3F3F',
+    height: 1,
+    marginVertical: 16,
+  },
+  table: {
+    borderWidth: 1,
+    borderColor: '#3F3F3F',
+    borderRadius: 8,
+    marginVertical: 8,
+    overflow: 'hidden',
+  },
+  thead: {
+    backgroundColor: '#2F2F2F',
+  },
+  tbody: {
+    backgroundColor: '#1A1A1A',
+  },
+  th: {
+    color: '#ECECEC',
+    fontWeight: '700',
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#3F3F3F',
+  },
+  tr: {
+    borderBottomWidth: 1,
+    borderColor: '#3F3F3F',
+  },
+  td: {
+    color: '#ECECEC',
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#3F3F3F',
+  },
+  s: {
+    textDecorationLine: 'line-through',
+    color: '#8E8EA0',
+  },
+  del: {
+    textDecorationLine: 'line-through',
+    color: '#8E8EA0',
+  },
+};
