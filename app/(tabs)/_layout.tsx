@@ -9,7 +9,7 @@ const TabLayout = () => {
     >
       <Tabs.Screen
         name="index"
-        options={{ title: 'Okhrangpt', headerShown: false }}
+        options={{ title: 'Dashboard', headerShown: false }}
       />
       <Tabs.Screen
         name="camera"

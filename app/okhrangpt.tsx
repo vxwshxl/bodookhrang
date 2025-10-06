@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
-import { SARVAM_API_KEY } from "@env"; // ✅ import from .env
+import { SARVAM_API_KEY, SARVAM_API_ENDPOINT } from "@env"; // ✅ import from .env
 
-const API_URL = "https://api.sarvam.ai/v1/chat/completions";
+const API_URL = SARVAM_API_ENDPOINT;
 
 export default function OkhranGPT() {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
@@ -24,8 +24,11 @@ export default function OkhranGPT() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "sarvam-m",
-          messages: newMessages,
+          "model": "sarvam-m",
+          "messages": newMessages,
+          "reasoning_effort": "high",
+          "max_tokens": 30000,
+          "wiki_grounding": true,
         }),
       });
 

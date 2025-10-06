@@ -57,7 +57,7 @@ const TabBarButton = (
                     })}
                 </Animated.View>
                 <Animated.Text
-                    style={[{ color: isFocused ? "#29292B" : "#fff", fontSize: 12 }, animatedTextStyle]}>{label}
+                    style={[{ color: isFocused ? "#29292B" : "#fff", fontSize: 12, fontFamily: "fgr" }, animatedTextStyle]}>{label}
                 </Animated.Text>
             </PlatformPressable>
         )

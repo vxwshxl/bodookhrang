@@ -43,7 +43,7 @@ export default function TranslateScreen() {
   const [favoritesAnimation] = useState(new Animated.Value(0));
   const [copiedStates, setCopiedStates] = useState<{ [key: string]: boolean }>({});
   const [sourceLang, setSourceLang] = useState('English');
-  const [targetLang, setTargetLang] = useState('Hindi');
+  const [targetLang, setTargetLang] = useState('Bodo');
   const [showSourceLangModal, setShowSourceLangModal] = useState(false);
   const [showTargetLangModal, setShowTargetLangModal] = useState(false);
 
@@ -706,6 +706,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     color: '#fff',
+    fontFamily: "twk",
   },
   checkButton: {
     width: 40,
@@ -743,11 +744,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#999',
     marginRight: 4,
+    fontFamily: 'fgr',
   },
   languageTextTarget: {
     fontSize: 14,
     color: '#00D9FF',
     marginRight: 4,
+    fontFamily: 'fgr',
   },
   inputContainer: {
     position: 'relative',
@@ -758,6 +761,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     minHeight: 40,
     paddingRight: 40,
+    fontFamily: 'fgr',
   },
   clearButton: {
     position: 'absolute',
@@ -771,6 +775,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: '#00D9FF',
     fontWeight: '500',
+    fontFamily: 'fgr',
   },
   swapContainer: {
     flexDirection: 'row',
@@ -811,6 +816,7 @@ const styles = StyleSheet.create({
     color: '#000',
     fontWeight: '600',
     fontSize: 16,
+    fontFamily: 'fgr',
   },
   savedCard: {
     backgroundColor: '#1a1a1a',
@@ -825,11 +831,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999',
     marginBottom: 8,
+    fontFamily: 'fgr',
   },
   cardLangTarget: {
     fontSize: 12,
     color: '#00D9FF',
     marginBottom: 8,
+    fontFamily: 'fgr',
   },
   cardTextRow: {
     flexDirection: 'row',
@@ -842,6 +850,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     flex: 1,
     marginRight: 12,
+    fontFamily: 'fgr',
   },
   cardTextTarget: {
     fontSize: 20,
@@ -849,6 +858,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     flex: 1,
     marginRight: 12,
+    fontFamily: 'fgr',
   },
   cardDivider: {
     height: 1,
@@ -893,11 +903,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 8,
+    fontFamily: 'twk',
   },
   menuSubtext: {
     fontSize: 16,
     color: '#999',
     textAlign: 'center',
+    fontFamily: 'fgr',
   },
   favoritesContainer: {
     backgroundColor: '#0a0a0a',
@@ -917,6 +929,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
     color: '#fff',
+    fontFamily: 'twk',
   },
   closeButton: {
     width: 44,
@@ -935,6 +948,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginTop: 40,
+    fontFamily: 'fgr',
   },
   favoriteCard: {
     backgroundColor: '#2a2a2a',
@@ -947,6 +961,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#fff',
     marginBottom: 16,
+    fontFamily: 'twk',
   },
   favoriteContent: {
     backgroundColor: '#1a1a1a',
@@ -960,11 +975,13 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#999',
     marginBottom: 6,
+    fontFamily: 'fgr',
   },
   favoriteLangTarget: {
     fontSize: 11,
     color: '#00D9FF',
     marginBottom: 6,
+    fontFamily: 'fgr',
   },
   favoriteTextRow: {
     flexDirection: 'row',
@@ -977,6 +994,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     flex: 1,
     marginRight: 12,
+    fontFamily: 'fgr',
   },
   favoriteTextTarget: {
     fontSize: 18,
@@ -984,6 +1002,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     flex: 1,
     marginRight: 12,
+    fontFamily: 'fgr',
   },
   favoriteActions: {
     flexDirection: 'row',
@@ -1012,6 +1031,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 16,
     textAlign: 'center',
+    fontFamily: "twk",
   },
   languageOption: {
     flexDirection: 'row',
@@ -1028,6 +1048,7 @@ const styles = StyleSheet.create({
   languageOptionText: {
     fontSize: 16,
     color: '#fff',
+    fontFamily: 'fgr'
   },
   languageOptionTextActive: {
     color: '#00D9FF',

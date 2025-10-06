@@ -1,17 +1,20 @@
-import { Feather } from '@expo/vector-icons';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import Fontisto from '@expo/vector-icons/Fontisto';
 import React from 'react';
 
 export const icon = {
     index: (props: any) => (
-        <Feather name='compass' size={24} {...props} />
+        <MaterialIcons name="dashboard" size={24} {...props} />
     ),
     camera: (props: any) => (
-        <Feather name='camera' size={24} {...props} />
+        <FontAwesome6 name="camera-retro" size={24} {...props} />
     ),
     translate: (props: any) => (
-        <Feather name='compass' size={24} {...props} />
+        <MaterialCommunityIcons name="translate" size={24} {...props} />
     ),
     profile: (props: any) => (
-        <Feather name='user' size={24} {...props} />
+        <Fontisto name="user-secret" size={24} {...props} />
     ),
 }
