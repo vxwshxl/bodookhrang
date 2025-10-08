@@ -55,18 +55,13 @@ const CarouselMedia = ({ children }) => {
 
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
-      const firstVisible = viewableItems[0].item;
-      if (firstVisible.media_type === 'VIDEO') {
-        setVisibleVideoIndex(viewableItems[0].index);
-      } else {
-        setVisibleVideoIndex(null);
-      }
+      setCurrentIndex(viewableItems[0].index);
     }
   }).current;
-  
+
   const viewabilityConfig = useRef({
-    itemVisiblePercentThreshold: 80,
-  }).current;  
+    itemVisiblePercentThreshold: 50,
+  }).current;
 
   return (
     <View>
