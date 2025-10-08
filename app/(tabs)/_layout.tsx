@@ -9,15 +9,15 @@ const TabLayout = () => {
     >
       <Tabs.Screen
         name="index"
-        options={{ title: 'Dashboard', headerShown: false }}
-      />
-      <Tabs.Screen
-        name="camera"
-        options={{ title: 'Camera', headerShown: false }}
+        options={{ title: 'OkhranGPT', headerShown: false }}
       />
       <Tabs.Screen
         name="translate"
         options={{ title: 'Translate', headerShown: false }}
+      />
+      <Tabs.Screen
+        name="bodoland"
+        options={{ title: 'Bodoland', headerShown: false }}
       />
       <Tabs.Screen
         name="profile"

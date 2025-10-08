@@ -21,6 +21,10 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { BlurView } from 'expo-blur';
 import { SARVAM_API_KEY, SARVAM_API_ENDPOINT, SARVAM_MODEL, REASONING_EFFORT, MAX_TOKENS } from '@env';
 import Markdown from 'react-native-markdown-display';
+import * as Clipboard from 'expo-clipboard';
+
+import ThinkingBlock from '@/components/ThinkingBlock';
+import CustomMarkdown from '@/components/CustomMarkdown';
 
 // Suggestion buttons data
 const SUGGESTIONS = [
@@ -41,6 +45,7 @@ export default function ChatApp() {
   const [modelDropdownVisible, setModelDropdownVisible] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(null);
   const [chatHistory, setChatHistory] = useState([
     { id: 1, title: 'Python task list', selected: true },
     { id: 2, title: 'Vedas summary for test', selected: false },
@@ -50,6 +55,25 @@ export default function ChatApp() {
   const [currentChatTitle, setCurrentChatTitle] = useState('New Chat');
   const scrollViewRef = useRef();
   const slideAnim = useRef(new Animated.Value(-300)).current;
+
+  const [expandedThinkings, setExpandedThinkings] = useState({});
+
+  const handleToggleThinking = (index) => {
+    setExpandedThinkings((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  const copyToClipboard = async (text, index) => {
+    try {
+      await Clipboard.setStringAsync(text);
+      setCopiedCode(index);
+      setTimeout(() => setCopiedCode(null), 3000);
+    } catch (error) {
+      console.error('Failed to copy:', error);
+    }
+  };
 
   const sendMessage = async (messageText) => {
     Keyboard.dismiss();
@@ -184,7 +208,7 @@ export default function ChatApp() {
             <View style={styles.emptyState}>
               <View style={styles.logoContainer}>
                 <View style={styles.logo}>
-                  <MaterialCommunityIcons name="chat-processing" size={48} color="#19C37D" />
+                  <MaterialCommunityIcons name="chat-processing" size={48} color="#FF6B6B" />
                 </View>
               </View>
               
@@ -213,9 +237,20 @@ export default function ChatApp() {
                     msg.role === 'user' && styles.messageContentUser
                   ]}>
                     <View style={styles.messageTextContainer}>
-                      <Markdown style={markdownStyles}>
-                        {msg.content}
-                      </Markdown>
+                      {msg.role === 'assistant' ? (
+                        <CustomMarkdown 
+                          content={msg.content}
+                          index={index}
+                          copiedCode={copiedCode}
+                          onCopy={copyToClipboard}
+                          thinkingExpanded={expandedThinkings[index]}
+                          onToggleThinking={handleToggleThinking}
+                        />
+                      ) : (
+                        <Markdown style={markdownStyles}>
+                          {msg.content}
+                        </Markdown>
+                      )}
                       {msg.role === 'assistant' && (
                         <View style={styles.actionButtons}>
                           <TouchableOpacity style={styles.actionButton}>
@@ -237,7 +272,7 @@ export default function ChatApp() {
                 <View style={styles.messageRow}>
                   <View style={styles.messageContent}>
                     <View style={styles.loadingContainer}>
-                      <ActivityIndicator color="#19C37D" size="small" />
+                      <ActivityIndicator color="#FF6B6B" size="small" />
                     </View>
                   </View>
                 </View>
@@ -307,7 +342,7 @@ export default function ChatApp() {
                   okhrangsa
                 </Text>
                 {model === 'okhrangsa' && (
-                  <Ionicons name="checkmark" size={18} color="#19C37D" />
+                  <Ionicons name="checkmark" size={18} color="#FF6B6B" />
                 )}
               </TouchableOpacity>
               <TouchableOpacity
@@ -321,7 +356,7 @@ export default function ChatApp() {
                   aronai-bodo
                 </Text>
                 {model === 'aronai-bodo' && (
-                  <Ionicons name="checkmark" size={18} color="#19C37D" />
+                  <Ionicons name="checkmark" size={18} color="#FF6B6B" />
                 )}
               </TouchableOpacity>
             </View>
@@ -528,7 +563,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 100,
-    backgroundColor: '#19C37D',
+    backgroundColor: '#FF6B6B',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -630,8 +665,8 @@ const styles = StyleSheet.create({
     borderColor: '#3F3F3F',
   },
   modeButtonActive: {
-    backgroundColor: '#19C37D',
-    borderColor: '#19C37D',
+    backgroundColor: '#FF6B6B',
+    borderColor: '#FF6B6B',
   },
   modeText: {
     fontSize: 14,
@@ -675,7 +710,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   modelOptionActive: {
-    backgroundColor: 'rgba(25, 195, 125, 0.1)',
+    backgroundColor: 'rgba(255, 107, 107, 0.1)'
   },
   modelOptionText: {
     fontSize: 14,
@@ -683,7 +718,7 @@ const styles = StyleSheet.create({
     fontFamily: 'fgr',
   },
   modelOptionTextActive: {
-    color: '#19C37D',
+    color: '#FF6B6B',
     fontWeight: '600',
   },
   inputContainer: {
@@ -849,6 +884,94 @@ const styles = StyleSheet.create({
   menuItemDangerText: {
     color: '#FF453A',
   },
+
+  // Conversation
+  thinkingContainer: {
+    marginVertical: 8,
+    backgroundColor: '#1A1A1A',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#2F2F2F',
+    overflow: 'hidden',
+  },
+  thinkingHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  thinkingTitle: {
+    color: '#FF6B6B',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 8,
+    flex: 1,
+  },
+  thinkingContent: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    backgroundColor: '#0A0A0A',
+  },
+  thinkingBorder: {
+    height: 1,
+    backgroundColor: '#2F2F2F',
+    marginBottom: 8,
+  },
+  thinkingText: {
+    color: '#FFFFFF', // 👈 visible white text
+    fontSize: 14,
+    lineHeight: 20,
+    fontFamily: 'fgr',
+  },
+  codeBlockContainer: {
+    backgroundColor: '#1A1A1A',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#2F2F2F',
+    marginVertical: 8,
+    overflow: 'hidden',
+  },
+  codeBlockHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2F2F2F',
+    backgroundColor: '#0A0A0A',
+  },
+  codeLanguage: {
+    color: '#ECECEC',
+    fontSize: 14,
+    fontWeight: '500',
+    fontFamily: 'fgr',
+  },
+  copyCodeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  copyText: {
+    color: '#8E8EA0',
+    fontSize: 14,
+    fontFamily: 'fgr',
+  },
+  copiedText: {
+    color: '#FF6B6B',
+    fontSize: 14,
+    fontFamily: 'fgr',
+  },
+  codeBlockContent: {
+    color: '#ECECEC',
+    fontSize: 14,
+    padding: 16,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    lineHeight: 20,
+  },
 });
 
 const markdownStyles = {
@@ -922,12 +1045,12 @@ const markdownStyles = {
     fontStyle: 'italic',
   },
   link: {
-    color: '#19C37D',
+    color: '#FF6B6B',
     textDecorationLine: 'underline',
   },
   blockquote: {
     backgroundColor: '#2F2F2F',
-    borderLeftColor: '#19C37D',
+    borderLeftColor: '#FF6B6B',
     borderLeftWidth: 4,
     marginLeft: 0,
     marginRight: 0,
@@ -937,7 +1060,7 @@ const markdownStyles = {
   },
   code_inline: {
     backgroundColor: '#000',
-    color: '#19C37D',
+    color: '#FF6B6B',
     fontSize: 14,
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -977,13 +1100,13 @@ const markdownStyles = {
     marginVertical: 4,
   },
   bullet_list_icon: {
-    color: '#19C37D',
+    color: '#FF6B6B',
     fontSize: 17,
     lineHeight: 24,
     marginRight: 8,
   },
   ordered_list_icon: {
-    color: '#19C37D',
+    color: '#FF6B6B',
     fontSize: 17,
     lineHeight: 24,
     marginRight: 8,
@@ -1043,4 +1166,4 @@ const markdownStyles = {
     textDecorationLine: 'line-through',
     color: '#8E8EA0',
   },
-};
+}

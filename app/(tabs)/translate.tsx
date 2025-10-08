@@ -343,7 +343,7 @@ export default function TranslateScreen() {
                     {lang}
                   </Text>
                   {currentLang === lang && (
-                    <Ionicons name="checkmark" size={24} color="#00D9FF" />
+                    <Ionicons name="checkmark" size={24} color="#FF6B6B" />
                   )}
                 </TouchableOpacity>
               ))}
@@ -372,7 +372,7 @@ export default function TranslateScreen() {
             style={styles.checkButton}
             onPress={createNewCard}
           >
-            <Ionicons name="checkmark" size={24} color="#00D9FF" />
+            <Ionicons name="checkmark" size={24} color="#FF6B6B" />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity 
@@ -428,7 +428,7 @@ export default function TranslateScreen() {
               style={styles.swapButton}
               onPress={swapLanguages}
             >
-              <MaterialIcons name="swap-vert" size={24} color="#00D9FF" />
+              <MaterialIcons name="swap-vert" size={24} color="#FF6B6B" />
             </TouchableOpacity>
             <View style={styles.divider} />
           </View>
@@ -440,7 +440,7 @@ export default function TranslateScreen() {
               onPress={() => setShowTargetLangModal(true)}
             >
               <Text style={styles.languageTextTarget}>{targetLang}</Text>
-              <Ionicons name="chevron-down" size={16} color="#00D9FF" />
+              <Ionicons name="chevron-down" size={16} color="#FF6B6B" />
             </TouchableOpacity>
             <View style={styles.outputContainer}>
               <Text style={styles.output}>
@@ -458,17 +458,17 @@ export default function TranslateScreen() {
                   {copiedStates['main'] ? (
                     <Ionicons name="checkmark" size={24} color="#00FF00" />
                   ) : (
-                    <MaterialIcons name="content-copy" size={24} color="#00D9FF" />
+                    <MaterialIcons name="content-copy" size={24} color="#FF6B6B" />
                   )}
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.actionButton}>
-                  <Ionicons name="star-outline" size={24} color="#00D9FF" />
+                  <Ionicons name="star-outline" size={24} color="#FF6B6B" />
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.actionButton}
                   onPress={() => shareText(`${sourceText}\n→ ${translatedText}`)}
                 >
-                  <Ionicons name="share-outline" size={24} color="#00D9FF" />
+                  <Ionicons name="share-outline" size={24} color="#FF6B6B" />
                 </TouchableOpacity>
                 {(sourceText.trim() || translatedText.trim()) && (
                   <TouchableOpacity 
@@ -507,7 +507,7 @@ export default function TranslateScreen() {
                 <View style={styles.cardTextRow}>
                   <Text style={styles.cardTextTarget}>{card.translatedText}</Text>
                   <TouchableOpacity>
-                    <Ionicons name="volume-high" size={24} color="#00D9FF" />
+                    <Ionicons name="volume-high" size={24} color="#FF6B6B" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -520,20 +520,20 @@ export default function TranslateScreen() {
                   {copiedStates[card.id] ? (
                     <Ionicons name="checkmark" size={24} color="#00FF00" />
                   ) : (
-                    <MaterialIcons name="content-copy" size={24} color="#00D9FF" />
+                    <MaterialIcons name="content-copy" size={24} color="#FF6B6B" />
                   )}
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => toggleBookmark(card.id)}>
                   <Ionicons 
                     name={card.isBookmarked ? "star" : "star-outline"} 
                     size={24} 
-                    color="#00D9FF" 
+                    color="#FF6B6B" 
                   />
                 </TouchableOpacity>
                 <TouchableOpacity 
                   onPress={() => shareText(`${card.sourceText}\n→ ${card.translatedText}`)}
                 >
-                  <Ionicons name="share-outline" size={24} color="#00D9FF" />
+                  <Ionicons name="share-outline" size={24} color="#FF6B6B" />
                 </TouchableOpacity>
                 <View style={styles.spacer} />
                 <TouchableOpacity 
@@ -624,7 +624,7 @@ export default function TranslateScreen() {
                               <View style={styles.favoriteTextRow}>
                                 <Text style={styles.favoriteTextTarget}>{card.translatedText}</Text>
                                 <TouchableOpacity>
-                                  <Ionicons name="volume-high" size={24} color="#00D9FF" />
+                                  <Ionicons name="volume-high" size={24} color="#FF6B6B" />
                                 </TouchableOpacity>
                               </View>
                             </View>
@@ -636,11 +636,11 @@ export default function TranslateScreen() {
                                 {copiedStates[`fav-${card.id}`] ? (
                                   <Ionicons name="checkmark" size={24} color="#00FF00" />
                                 ) : (
-                                  <MaterialIcons name="content-copy" size={24} color="#00D9FF" />
+                                  <MaterialIcons name="content-copy" size={24} color="#FF6B6B" />
                                 )}
                               </TouchableOpacity>
                               <TouchableOpacity onPress={() => toggleBookmark(card.id)}>
-                                <Ionicons name="star" size={24} color="#00D9FF" />
+                                <Ionicons name="star" size={24} color="#FF6B6B" />
                               </TouchableOpacity>
                               <View style={styles.spacer} />
                               <TouchableOpacity 
@@ -748,7 +748,7 @@ const styles = StyleSheet.create({
   },
   languageTextTarget: {
     fontSize: 14,
-    color: '#00D9FF',
+    color: '#FF6B6B',
     marginRight: 4,
     fontFamily: 'fgr',
   },
@@ -773,7 +773,7 @@ const styles = StyleSheet.create({
   },
   output: {
     fontSize: 28,
-    color: '#00D9FF',
+    color: '#FF6B6B',
     fontWeight: '500',
     fontFamily: 'fgr',
   },
@@ -807,7 +807,7 @@ const styles = StyleSheet.create({
   },
   nextButton: {
     marginLeft: 'auto',
-    backgroundColor: '#00D9FF',
+    backgroundColor: '#FF6B6B',
     paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 20,
@@ -835,7 +835,7 @@ const styles = StyleSheet.create({
   },
   cardLangTarget: {
     fontSize: 12,
-    color: '#00D9FF',
+    color: '#FF6B6B',
     marginBottom: 8,
     fontFamily: 'fgr',
   },
@@ -854,7 +854,7 @@ const styles = StyleSheet.create({
   },
   cardTextTarget: {
     fontSize: 20,
-    color: '#00D9FF',
+    color: '#FF6B6B',
     fontWeight: '500',
     flex: 1,
     marginRight: 12,
@@ -979,7 +979,7 @@ const styles = StyleSheet.create({
   },
   favoriteLangTarget: {
     fontSize: 11,
-    color: '#00D9FF',
+    color: '#FF6B6B',
     marginBottom: 6,
     fontFamily: 'fgr',
   },
@@ -998,7 +998,7 @@ const styles = StyleSheet.create({
   },
   favoriteTextTarget: {
     fontSize: 18,
-    color: '#00D9FF',
+    color: '#FF6B6B',
     fontWeight: '500',
     flex: 1,
     marginRight: 12,
@@ -1051,7 +1051,7 @@ const styles = StyleSheet.create({
     fontFamily: 'fgr'
   },
   languageOptionTextActive: {
-    color: '#00D9FF',
+    color: '#FF6B6B',
     fontWeight: '600',
   },
   cardContent: {},

@@ -8,11 +8,11 @@ export const icon = {
     index: (props: any) => (
         <MaterialIcons name="dashboard" size={24} {...props} />
     ),
-    camera: (props: any) => (
-        <FontAwesome6 name="camera-retro" size={24} {...props} />
-    ),
     translate: (props: any) => (
         <MaterialCommunityIcons name="translate" size={24} {...props} />
+    ),
+    bodoland: (props: any) => (
+        <FontAwesome6 name="1" size={24} {...props} />
     ),
     profile: (props: any) => (
         <Fontisto name="user-secret" size={24} {...props} />
