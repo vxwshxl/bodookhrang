@@ -193,15 +193,18 @@ const InstagramProfile = () => {
 
   const onScroll = (event) => {
     const scrollY = event.nativeEvent.contentOffset.y;
+    let newVisibleIndex = null;
     
     postsData.forEach((post, index) => {
-      if (post.media_type === 'VIDEO') {
-        const postOffset = index * (SCREEN_WIDTH + 200);
-        if (scrollY >= postOffset - 200 && scrollY <= postOffset + SCREEN_WIDTH) {
-          setVisibleVideoIndex(index);
-        }
+      const postOffset = index * (SCREEN_WIDTH + 200);
+      const isInView = scrollY >= postOffset - 200 && scrollY <= postOffset + SCREEN_WIDTH;
+      
+      if (isInView && post.media_type === 'VIDEO') {
+        newVisibleIndex = index;
       }
     });
+    
+    setVisibleVideoIndex(newVisibleIndex);
   };
 
   const renderMedia = (post, index) => {
@@ -215,24 +218,15 @@ const InstagramProfile = () => {
     } else if (post.media_type === 'CAROUSEL_ALBUM' && post.children?.data) {
       return <CarouselMedia children={post.children.data} />;
     } else {
-      const [imgHeight, setImgHeight] = useState(SCREEN_WIDTH); // default fallback
-  
-      useEffect(() => {
-        Image.getSize(post.media_url, (w, h) => {
-          const ratio = h / w;
-          setImgHeight(SCREEN_WIDTH * ratio);
-        });
-      }, [post.media_url]);
-  
       return (
         <Image
           source={{ uri: post.media_url }}
-          style={{ width: SCREEN_WIDTH, height: imgHeight, backgroundColor: '#000' }}
+          style={styles.media}
           resizeMode="cover"
         />
       );
     }
-  };  
+  };
 
   if (loading || !profileData) {
     return (
@@ -248,7 +242,6 @@ const InstagramProfile = () => {
       <View style={styles.header}>
         <TouchableOpacity style={styles.headerLeft}>
           <Text style={styles.headerUsername}>{profileData.username}</Text>
-          <Ionicons name="chevron-down" size={16} color="#fff" style={styles.chevron} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.iconButton}>
           <Ionicons name="notifications-outline" size={26} color="#fff" />
@@ -268,6 +261,10 @@ const InstagramProfile = () => {
               source={{ uri: profileData.profile_picture_url }}
               style={styles.profilePic}
             />
+
+            {/* Name */}
+            <Text style={styles.profileName}>{profileData.name || profileData.username}</Text>
+            
             <View style={styles.statsContainer}>
               <View style={styles.stat}>
                 <Text style={styles.statNumber}>{profileData.media_count}</Text>
@@ -281,9 +278,6 @@ const InstagramProfile = () => {
               </View>
             </View>
           </View>
-
-          {/* Name */}
-          <Text style={styles.profileName}>{profileData.name || profileData.username}</Text>
 
           {/* Category and Bio Toggle */}
           <View style={styles.categoryRow}>
@@ -387,10 +381,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
   },
-  chevron: {
-    marginLeft: 4,
-    marginTop: 2,
-  },
   iconButton: {
     padding: 4,
   },
@@ -418,9 +408,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingLeft: 20,
-  },
-  stat: {
-    alignItems: 'center',
   },
   statNumber: {
     color: '#fff',
