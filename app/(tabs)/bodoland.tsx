@@ -256,40 +256,42 @@ const InstagramProfile = () => {
       >
         {/* Profile Info */}
         <View style={styles.profileSection}>
-          <View style={styles.profileRow}>
-            <Image
-              source={{ uri: profileData.profile_picture_url }}
-              style={styles.profilePic}
-            />
+          {/* Profile Header */}
+          <View style={styles.profileHeader}>
+            <View style={styles.profileTopRow}>
+              <Image
+                source={{ uri: profileData.profile_picture_url }}
+                style={styles.profilePic}
+              />
+              <View style={styles.profileRight}>
+                <Text style={styles.displayName}>{profileData.name || profileData.username}</Text>
+                <View style={styles.statsRow}>
+                  <View style={styles.statItem}>
+                    <Text style={styles.statNumber}>{profileData.media_count}</Text>
+                    <Text style={styles.statLabel}>posts</Text>
+                  </View>
+                  <View style={styles.statItem}>
+                    <Text style={styles.statNumber}>{formatFollowers(profileData.followers_count)}</Text>
+                    <Text style={styles.statLabel}>followers</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
 
-            {/* Name */}
-            <Text style={styles.profileName}>{profileData.name || profileData.username}</Text>
-            
-            <View style={styles.statsContainer}>
-              <View style={styles.stat}>
-                <Text style={styles.statNumber}>{profileData.media_count}</Text>
-                <Text style={styles.statLabel}>posts</Text>
-              </View>
-              <View style={styles.stat}>
-                <Text style={styles.statNumber}>
-                  {formatFollowers(profileData.followers_count)}
-                </Text>
-                <Text style={styles.statLabel}>followers</Text>
-              </View>
+            <View style={styles.categoryRow}>
+              <Text style={styles.category}>{profileData.category || 'Media/news company'}</Text>
+              <TouchableOpacity onPress={() => setShowBio(!showBio)}>
+                <Ionicons 
+                  name={showBio ? "chevron-up" : "chevron-down"} 
+                  size={20} 
+                  color="#999" 
+                />
+              </TouchableOpacity>
             </View>
           </View>
 
           {/* Category and Bio Toggle */}
-          <View style={styles.categoryRow}>
-            <Text style={styles.category}>{profileData.category || 'Media/news company'}</Text>
-            <TouchableOpacity onPress={() => setShowBio(!showBio)}>
-              <Ionicons 
-                name={showBio ? "chevron-up" : "chevron-down"} 
-                size={20} 
-                color="#fff" 
-              />
-            </TouchableOpacity>
-          </View>
+
 
           {showBio && (
             <View style={styles.bioSection}>
@@ -391,18 +393,57 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
   },
-  profileRow: {
+  profileHeader: {
+    paddingBottom: 6,
+    backgroundColor: '#000',
+    alignItems: 'center',
+  },
+  profileTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    justifyContent: 'center',
+    gap: 10
   },
   profilePic: {
-    width: 86,
-    height: 86,
-    borderRadius: 43,
-    borderWidth: 2,
-    borderColor: '#333',
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    borderWidth: 1.5,
+    borderColor: '#222',
+    marginRight: 16,
+    gap: 6,
   },
+  profileRight: {
+    alignItems: 'flex-start',
+  },  
+  displayName: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 50,
+  },
+  statItem: {
+    alignItems: 'left',
+  },
+  statNumber: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  statLabel: {
+    color: '#aaa',
+    fontSize: 12,
+  },
+  categoryText: {
+    color: '#999',
+    fontSize: 13,
+    marginTop: 6,
+  },  
   statsContainer: {
     flex: 1,
     flexDirection: 'row',
@@ -429,14 +470,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 6,
+    paddingTop: 6,
+    gap: 150,
   },
   category: {
     color: '#999',
     fontSize: 13,
   },
   bioSection: {
-    marginTop: 8,
+    marginBottom: 20
   },
   bioText: {
     color: '#fff',
@@ -479,7 +521,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   postsSection: {
-    marginTop: 20,
+    paddingBottom: 100,
   },
   postContainer: {
     marginBottom: 20,
