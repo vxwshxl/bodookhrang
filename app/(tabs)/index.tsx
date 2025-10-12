@@ -79,17 +79,27 @@ export default function ChatApp() {
     Keyboard.dismiss();
     const textToSend = messageText || input;
     if (!textToSend.trim()) return;
-
-    const newMessages = [...messages, { role: 'user', content: textToSend }];
-    setMessages(newMessages);
-    setInput('');
+  
+    // Add system context for One Bodoland
+    const systemMessage = {
+      role: "system",
+      content: `You are assisting as "One Bodoland" AI. One Bodoland is a media platform that covers the latest news happening around Bodoland, for the youth and by the youth.
+  - 🚨 Latest updates on politics, society, culture, and events in Bodoland.
+  - 📰 Independent, factual reporting without bias.
+  - 🎤 Perspectives and stories from the community, for the community.
+  When responding, focus on factual, unbiased, and youth-friendly news-related content relevant to Bodoland.`
+    };
+  
+    const newMessages = [systemMessage, ...messages, { role: 'user', content: textToSend }];
+    setMessages([...messages, { role: 'user', content: textToSend }]);
+    setInput(''); 
     setLoading(true);
-
+  
     // Set chat title from first message
     if (messages.length === 0) {
       setCurrentChatTitle(textToSend.slice(0, 30) + (textToSend.length > 30 ? '...' : ''));
     }
-
+  
     try {
       const response = await fetch(SARVAM_API_ENDPOINT, {
         method: "POST",
@@ -106,26 +116,26 @@ export default function ChatApp() {
           temperature: 0.2
         }),
       });
-
+  
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
+  
       const data = await response.json();
-      console.log('API Response:', data);
-      
       const reply = data?.choices?.[0]?.message?.content || 'No response received.';
-      setMessages([...newMessages, { role: 'assistant', content: reply }]);
+      setMessages([...messages, { role: 'user', content: textToSend }, { role: 'assistant', content: reply }]);
     } catch (err) {
       console.error('Error:', err);
-      setMessages([...newMessages, { 
+      setMessages([...messages, { 
+        role: 'user', content: textToSend
+      }, {
         role: 'assistant', 
         content: `Error: ${err.message}. Please check your network connection and API key.`
       }]);
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   const handleSuggestionPress = (suggestion) => {
     sendMessage(suggestion);
