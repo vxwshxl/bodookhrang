@@ -92,7 +92,7 @@ export default function ChatApp() {
   
     const newMessages = [systemMessage, ...messages, { role: 'user', content: textToSend }];
     setMessages([...messages, { role: 'user', content: textToSend }]);
-    setInput(''); 
+    setInput('');
     setLoading(true);
   
     // Set chat title from first message
