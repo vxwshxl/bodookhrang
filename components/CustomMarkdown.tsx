@@ -5,7 +5,7 @@ import Markdown from 'react-native-markdown-display';
 import { Ionicons, Octicons } from '@expo/vector-icons';
 import ThinkingBlock from './ThinkingBlock'; // make sure the path is correct
 
-const CustomMarkdown = ({ content, index, copiedCode, onCopy, thinkingExpanded, onToggleThinking }) => {
+const CustomMarkdown = ({ children: content, index, copiedCode, onCopy, thinkingExpanded, onToggleThinking }) => {
   // Extract thinking block
   const thinkRegex = /<think>([\s\S]*?)<\/think>/;
   const thinkMatch = content.match(thinkRegex);
@@ -85,7 +85,7 @@ const CustomMarkdown = ({ content, index, copiedCode, onCopy, thinkingExpanded, 
                 <TouchableOpacity style={styles.copyCodeButton} onPress={() => onCopy(part.code, part.codeKey)}>
                   {part.isCopied ? (
                     <>
-                      <Ionicons name="checkmark" size={16} color="#FF6B6B" />
+                      <Ionicons name="checkmark" size={16} color="#fff" />
                       <Text style={styles.copiedText}>Copied</Text>
                     </>
                   ) : (
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     fontFamily: 'fgr',
   },
   copiedText: {
-    color: '#FF6B6B',
+    color: '#fff',
     fontSize: 14,
     fontFamily: 'fgr',
   },
@@ -172,8 +172,8 @@ const markdownStyles = {
   paragraph: { color: '#ECECEC', fontSize: 17, lineHeight: 24, marginTop: 0, marginBottom: 12 },
   strong: { color: '#ECECEC', fontWeight: '700' },
   em: { color: '#ECECEC', fontStyle: 'italic' },
-  link: { color: '#FF6B6B', textDecorationLine: 'underline' },
-  blockquote: { backgroundColor: '#2F2F2F', borderLeftColor: '#FF6B6B', borderLeftWidth: 4, marginLeft: 0, marginRight: 0, paddingHorizontal: 16, paddingVertical: 8, marginVertical: 8 },
-  code_inline: { backgroundColor: '#000', color: '#FF6B6B', fontSize: 14, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
+  link: { color: '#fff', textDecorationLine: 'underline' },
+  blockquote: { backgroundColor: '#2F2F2F', borderLeftColor: '#fff', borderLeftWidth: 4, marginLeft: 0, marginRight: 0, paddingHorizontal: 16, paddingVertical: 8, marginVertical: 8 },
+  code_inline: { backgroundColor: '#000', color: '#fff', fontSize: 14, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
   code_block: { backgroundColor: '#1A1A1A', color: '#ECECEC', fontSize: 14, padding: 12, borderRadius: 8, marginVertical: 8, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', borderWidth: 1, borderColor: '#2F2F2F' },
 };

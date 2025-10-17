@@ -32,8 +32,8 @@ const SUGGESTIONS = [
   { text: 'Ramayana', icon: 'book-outline' },
   { text: 'Maths Problem', icon: 'calculator-outline' },
   { text: 'Translate', icon: 'language-outline' },
-  { text: 'Coding', icon: 'code-slash-outline' },
-  { text: "What's in my Aadhaar?", icon: 'card-outline' }
+  { text: 'Coding', icon: 'code' },
+  { text: "Simple python print code", icon: 'code-slash-outline' }
 ];
 
 export default function ChatApp() {
@@ -218,7 +218,7 @@ export default function ChatApp() {
             <View style={styles.emptyState}>
               <View style={styles.logoContainer}>
                 <View style={styles.logo}>
-                  <MaterialCommunityIcons name="chat-processing" size={48} color="#FF6B6B" />
+                  <MaterialCommunityIcons name="chat-processing" size={48} color="#fff" />
                 </View>
               </View>
               
@@ -282,7 +282,7 @@ export default function ChatApp() {
                 <View style={styles.messageRow}>
                   <View style={styles.messageContent}>
                     <View style={styles.loadingContainer}>
-                      <ActivityIndicator color="#FF6B6B" size="small" />
+                      <ActivityIndicator color="#fff" size="small" />
                     </View>
                   </View>
                 </View>
@@ -303,7 +303,7 @@ export default function ChatApp() {
                 <Ionicons 
                   name="bulb-outline" 
                   size={18} 
-                  color={mode === 'Think' ? '#ECECEC' : '#8E8EA0'} 
+                  color={mode === 'Think' ? '#000' : '#8E8EA0'} 
                 />
                 <Text style={[styles.modeText, mode === 'Think' && styles.modeTextActive]}>
                   Think
@@ -317,7 +317,7 @@ export default function ChatApp() {
                 <Ionicons 
                   name="library-outline" 
                   size={18} 
-                  color={mode === 'Wiki' ? '#ECECEC' : '#8E8EA0'} 
+                  color={mode === 'Wiki' ? '#000' : '#8E8EA0'} 
                 />
                 <Text style={[styles.modeText, mode === 'Wiki' && styles.modeTextActive]}>
                   Wiki
@@ -352,7 +352,7 @@ export default function ChatApp() {
                   okhrangsa
                 </Text>
                 {model === 'okhrangsa' && (
-                  <Ionicons name="checkmark" size={18} color="#FF6B6B" />
+                  <Ionicons name="checkmark" size={18} color="#fff" />
                 )}
               </TouchableOpacity>
               <TouchableOpacity
@@ -366,7 +366,7 @@ export default function ChatApp() {
                   aronai-bodo
                 </Text>
                 {model === 'aronai-bodo' && (
-                  <Ionicons name="checkmark" size={18} color="#FF6B6B" />
+                  <Ionicons name="checkmark" size={18} color="#fff" />
                 )}
               </TouchableOpacity>
             </View>
@@ -573,7 +573,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 100,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -675,8 +675,8 @@ const styles = StyleSheet.create({
     borderColor: '#3F3F3F',
   },
   modeButtonActive: {
-    backgroundColor: '#FF6B6B',
-    borderColor: '#FF6B6B',
+    backgroundColor: '#fff',
+    borderColor: '#fff',
   },
   modeText: {
     fontSize: 14,
@@ -685,7 +685,7 @@ const styles = StyleSheet.create({
     fontFamily: 'fgr',
   },
   modeTextActive: {
-    color: '#fff',
+    color: '#000',
   },
   modelButton: {
     flexDirection: 'row',
@@ -720,7 +720,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   modelOptionActive: {
-    backgroundColor: 'rgba(255, 107, 107, 0.1)'
+    backgroundColor: 'rgba(255, 255, 255, 0.15)'
   },
   modelOptionText: {
     fontSize: 14,
@@ -728,7 +728,7 @@ const styles = StyleSheet.create({
     fontFamily: 'fgr',
   },
   modelOptionTextActive: {
-    color: '#FF6B6B',
+    color: '#fff',
     fontWeight: '600',
   },
   inputContainer: {
@@ -895,45 +895,7 @@ const styles = StyleSheet.create({
     color: '#FF453A',
   },
 
-  // Conversation
-  thinkingContainer: {
-    marginVertical: 8,
-    backgroundColor: '#1A1A1A',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#2F2F2F',
-    overflow: 'hidden',
-  },
-  thinkingHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  thinkingTitle: {
-    color: '#FF6B6B',
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: 8,
-    flex: 1,
-  },
-  thinkingContent: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: '#0A0A0A',
-  },
-  thinkingBorder: {
-    height: 1,
-    backgroundColor: '#2F2F2F',
-    marginBottom: 8,
-  },
-  thinkingText: {
-    color: '#FFFFFF', // 👈 visible white text
-    fontSize: 14,
-    lineHeight: 20,
-    fontFamily: 'fgr',
-  },
+
   codeBlockContainer: {
     backgroundColor: '#1A1A1A',
     borderRadius: 8,
@@ -971,7 +933,7 @@ const styles = StyleSheet.create({
     fontFamily: 'fgr',
   },
   copiedText: {
-    color: '#FF6B6B',
+    color: '#fff',
     fontSize: 14,
     fontFamily: 'fgr',
   },
@@ -991,189 +953,11 @@ const markdownStyles = {
     lineHeight: 24,
     fontFamily: 'fgr',
   },
-  heading1: {
-    color: '#ECECEC',
-    fontSize: 24,
-    fontWeight: '700',
-    marginTop: 16,
-    marginBottom: 12,
-    lineHeight: 32,
-  },
-  heading2: {
-    color: '#ECECEC',
-    fontSize: 22,
-    fontWeight: '700',
-    marginTop: 14,
-    marginBottom: 10,
-    lineHeight: 28,
-  },
-  heading3: {
-    color: '#ECECEC',
-    fontSize: 21,
-    fontWeight: '600',
-    marginTop: 12,
-    marginBottom: 8,
-    lineHeight: 26,
-  },
-  heading4: {
-    color: '#ECECEC',
-    fontSize: 20,
-    fontWeight: '600',
-    marginTop: 10,
-    marginBottom: 6,
-    lineHeight: 24,
-  },
-  heading5: {
-    color: '#ECECEC',
-    fontSize: 19,
-    fontWeight: '600',
-    marginTop: 8,
-    marginBottom: 4,
-    lineHeight: 22,
-  },
-  heading6: {
-    color: '#ECECEC',
-    fontSize: 18,
-    fontWeight: '600',
-    marginTop: 6,
-    marginBottom: 4,
-    lineHeight: 20,
-  },
   paragraph: {
     color: '#ECECEC',
     fontSize: 17,
     lineHeight: 24,
     marginTop: 0,
     marginBottom: 12,
-  },
-  strong: {
-    color: '#ECECEC',
-    fontWeight: '700',
-  },
-  em: {
-    color: '#ECECEC',
-    fontStyle: 'italic',
-  },
-  link: {
-    color: '#FF6B6B',
-    textDecorationLine: 'underline',
-  },
-  blockquote: {
-    backgroundColor: '#2F2F2F',
-    borderLeftColor: '#FF6B6B',
-    borderLeftWidth: 4,
-    marginLeft: 0,
-    marginRight: 0,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginVertical: 8,
-  },
-  code_inline: {
-    backgroundColor: '#000',
-    color: '#FF6B6B',
-    fontSize: 14,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-  },
-  code_block: {
-    backgroundColor: '#1A1A1A',
-    color: '#ECECEC',
-    fontSize: 14,
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 8,
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    borderWidth: 1,
-    borderColor: '#2F2F2F',
-  },
-  fence: {
-    backgroundColor: '#1A1A1A',
-    color: '#ECECEC',
-    fontSize: 14,
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 8,
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    borderWidth: 1,
-    borderColor: '#2F2F2F',
-  },
-  bullet_list: {
-    marginVertical: 8,
-  },
-  ordered_list: {
-    marginVertical: 8,
-  },
-  list_item: {
-    flexDirection: 'row',
-    marginVertical: 4,
-  },
-  bullet_list_icon: {
-    color: '#FF6B6B',
-    fontSize: 17,
-    lineHeight: 24,
-    marginRight: 8,
-  },
-  ordered_list_icon: {
-    color: '#FF6B6B',
-    fontSize: 17,
-    lineHeight: 24,
-    marginRight: 8,
-  },
-  bullet_list_content: {
-    flex: 1,
-    color: '#ECECEC',
-    fontSize: 17,
-    lineHeight: 24,
-  },
-  ordered_list_content: {
-    flex: 1,
-    color: '#ECECEC',
-    fontSize: 17,
-    lineHeight: 24,
-  },
-  hr: {
-    backgroundColor: '#3F3F3F',
-    height: 1,
-    marginVertical: 16,
-  },
-  table: {
-    borderWidth: 1,
-    borderColor: '#3F3F3F',
-    borderRadius: 8,
-    marginVertical: 8,
-    overflow: 'hidden',
-  },
-  thead: {
-    backgroundColor: '#2F2F2F',
-  },
-  tbody: {
-    backgroundColor: '#1A1A1A',
-  },
-  th: {
-    color: '#ECECEC',
-    fontWeight: '700',
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#3F3F3F',
-  },
-  tr: {
-    borderBottomWidth: 1,
-    borderColor: '#3F3F3F',
-  },
-  td: {
-    color: '#ECECEC',
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#3F3F3F',
-  },
-  s: {
-    textDecorationLine: 'line-through',
-    color: '#8E8EA0',
-  },
-  del: {
-    textDecorationLine: 'line-through',
-    color: '#8E8EA0',
   },
 }

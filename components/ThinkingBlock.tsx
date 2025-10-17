@@ -9,12 +9,12 @@ export default function ThinkingBlock({ content, index, thinkingExpanded, onTogg
         style={styles.thinkingHeader}
         onPress={() => onToggle(index)}
       >
-        <MaterialCommunityIcons name="brain" size={18} color="#FF6B6B" />
+        <MaterialCommunityIcons name="brain" size={18} color="#fff" />
         <Text style={styles.thinkingTitle}>Show Thinking</Text>
         <Ionicons 
           name={thinkingExpanded ? "chevron-up" : "chevron-down"} 
           size={18} 
-          color="#FF6B6B" 
+          color="#fff"
         />
       </TouchableOpacity>
       {thinkingExpanded && (
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   thinkingTitle: {
-    color: '#FF6B6B',
+    color: '#fff',
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 8,
