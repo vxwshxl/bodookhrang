@@ -1,11 +1,12 @@
 // components/CustomMarkdown.js
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import Markdown from 'react-native-markdown-display';
 import { Ionicons, Octicons } from '@expo/vector-icons';
+import React from 'react';
+import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Markdown from 'react-native-markdown-display';
 import ThinkingBlock from './ThinkingBlock'; // make sure the path is correct
 
-const CustomMarkdown = ({ children: content, index, copiedCode, onCopy, thinkingExpanded, onToggleThinking }) => {
+const CustomMarkdown = ({ content: contentProp, children, index, copiedCode, onCopy, thinkingExpanded, onToggleThinking }) => {
+  const content = contentProp || children || '';
   // Extract thinking block
   const thinkRegex = /<think>([\s\S]*?)<\/think>/;
   const thinkMatch = content.match(thinkRegex);
@@ -67,7 +68,7 @@ const CustomMarkdown = ({ children: content, index, copiedCode, onCopy, thinking
   return (
     <>
       {thinkingContent && (
-        <ThinkingBlock 
+        <ThinkingBlock
           content={thinkingContent}
           index={index}
           thinkingExpanded={thinkingExpanded}
